@@ -25,11 +25,12 @@
 
                 <nav>
                     <ul>
-                        <a href="#">Home/Search</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="Biologia?link=add">Home/Search</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         <a href="#">News</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         <a href="#">About</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         <a href="#">Help</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         <a href="#">Contact</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="#">Submit</a>&nbsp;&nbsp;&nbsp;&nbsp;
 
                     </ul>
                 </nav>
@@ -38,10 +39,10 @@
 
         <section>
             <article>
-                <h1>Informacion principal</h1>
-                <p>Lorem ipsum dolor sit amet...</p>
-                <p>Vivamus sed libero nec mauris pulvinar facilisis ut non sem...</p>
-                <p>Phasellus ligula massa, congue ac vulputate non, dignissim at augue...</p>
+                <h1>Descripción</h1>
+                <p>Ecología</p>
+                <p>Metabolismo</p>
+                <p>References</p>
             </article>
             <aside>
                 <h1>Clasificacion</h1>

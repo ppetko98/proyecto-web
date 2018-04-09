@@ -7,18 +7,88 @@ package mvc.controlador;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import mvc.modelo.dao.NomenclaturaJpaController;
+import mvc.modelo.entidades.Nomenclatura;
 
 /**
  *
  * @author Tamara
  */
-@WebServlet(name = "ActionServlet", urlPatterns = {"/ActionServlet"})
+@WebServlet(name = "ActionServlet", urlPatterns = {"/Biologia"},
+        loadOnStartup = 1)
 public class ActionServlet extends HttpServlet {
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        
+        NomenclaturaJpaController controller= new NomenclaturaJpaController();
+        List<Nomenclatura> clasificaciones = controller.findNomenclaturaEntities();
+        
+        ServletContext app = config.getServletContext();
+        
+         app.setAttribute("taxonomy", clasificaciones);
+        
+        
+    }
+
+     
+    
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        //Recuperar el parametro de peticion link
+        String operacion = req.getParameter("link");
+        
+        switch (operacion) {
+            case "add":
+                System.out.println("\nOpcion ALTA seleccionada\n");
+                break;
+            case "del":
+                System.out.println("\nOpcion BAJA seleccionada\n");
+                break;
+            case "edi":
+                System.out.println("\nOpcion MODIFICAR seleccionada\n");
+                break;
+            case "det":
+                System.out.println("\nOpcion DETALLES seleccionada\n");
+                break;
+            case "lis":
+                System.out.println("\nOpcion LISTADO seleccionada\n");
+                break;
+        }
+        
+        //Recuperar el parametro de peticion opc
+        
+         String opcion = req.getParameter("opc");
+
+        String vista = "";
+
+        if (opcion == null) {
+            // No existe parametro opc
+            // Carga inicial de la aplicacion
+            vista = "/inicial.jsp";
+        } else {
+            switch(opcion) {
+                case "act":
+                    ActoresAction action = new ActoresAction();
+                    vista = action.execute(req);
+                    break;
+                case "pel":
+                    PeliculasAction action2 = new PeliculasAction();
+                    vista = action2.execute(req);
+                    break;
+            }
+    }
+    
+    
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>

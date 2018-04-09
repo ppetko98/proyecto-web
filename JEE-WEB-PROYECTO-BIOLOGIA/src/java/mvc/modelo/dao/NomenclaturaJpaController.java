@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.transaction.UserTransaction;
@@ -33,9 +34,10 @@ import mvc.dao.exceptions.RollbackFailureException;
  */
 public class NomenclaturaJpaController implements Serializable {
 
-    public NomenclaturaJpaController(UserTransaction utx, EntityManagerFactory emf) {
+    public NomenclaturaJpaController() {
+        this.emf = this.emf = Persistence.createEntityManagerFactory("PU");
         this.utx = utx;
-        this.emf = emf;
+       
     }
     private UserTransaction utx = null;
     private EntityManagerFactory emf = null;
