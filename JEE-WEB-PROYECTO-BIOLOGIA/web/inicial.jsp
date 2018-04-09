@@ -8,11 +8,50 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css" />
         <title>ImaGene</title>
     </head>
-    <nav > </nav>
+
     <body>
-        <h1>Hello World!</h1>
+        <div id="">
+            <header>
+                <div id=>
+                    <img src=".png"  id="logo" />
+                    <h1>Imagene</h1>
+                    <h2>Travel diariese</h2>
+                </div>
+
+                <nav>
+                    <ul>
+                        <a href="#">Home/Search</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="#">News</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="#">About</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="#">Help</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="#">Contact</a>&nbsp;&nbsp;&nbsp;&nbsp;
+
+                    </ul>
+                </nav>
+            </header>
+        </div>
+
+        <section>
+            <article>
+                <h1>Informacion principal</h1>
+                <p>Lorem ipsum dolor sit amet...</p>
+                <p>Vivamus sed libero nec mauris pulvinar facilisis ut non sem...</p>
+                <p>Phasellus ligula massa, congue ac vulputate non, dignissim at augue...</p>
+            </article>
+            <aside>
+                <h1>Clasificacion</h1>
+
+            </aside>
+        </section>
+
     </body>
-</html>
+
+
+
+
+
