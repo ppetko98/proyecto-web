@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mvc.modelo.dao;
+package mvc.modelo.dao.impl;
 
 import java.io.Serializable;
 import javax.persistence.Query;
@@ -11,7 +11,6 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import mvc.modelo.entidades.Imagenes;
-import mvc.modelo.entidades.Genetica;
 import mvc.modelo.entidades.Nomenclatura;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,68 +18,63 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.UserTransaction;
-import mvc.modelo.entidades.Especie;
-import mvc.dao.exceptions.IllegalOrphanException;
-import mvc.dao.exceptions.NonexistentEntityException;
-import mvc.dao.exceptions.RollbackFailureException;
+import mvc.controlador.exceptions.IllegalOrphanException;
+import mvc.controlador.exceptions.NonexistentEntityException;
+import mvc.controlador.exceptions.RollbackFailureException;
+import mvc.modelo.entidades.Dominio;
 
 /**
  *
  * @author Tamara
  */
-public class EspecieJpaController implements Serializable {
+public class DominioControllerImpl implements Serializable {
 
-    public EspecieJpaController(UserTransaction utx, EntityManagerFactory emf) {
+    public DominioControllerImpl(UserTransaction utx, EntityManagerFactory emf) {
         this.utx = utx;
         this.emf = emf;
     }
     private UserTransaction utx = null;
     private EntityManagerFactory emf = null;
 
+    public DominioControllerImpl() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
 
-    public void create(Especie especie) throws RollbackFailureException, Exception {
-        if (especie.getNomenclaturaCollection() == null) {
-            especie.setNomenclaturaCollection(new ArrayList<Nomenclatura>());
+    public void create(Dominio dominio) throws RollbackFailureException, Exception {
+        if (dominio.getNomenclaturaCollection() == null) {
+            dominio.setNomenclaturaCollection(new ArrayList<Nomenclatura>());
         }
         EntityManager em = null;
         try {
             utx.begin();
             em = getEntityManager();
-            Imagenes imagen = especie.getImagen();
+            Imagenes imagen = dominio.getImagen();
             if (imagen != null) {
                 imagen = em.getReference(imagen.getClass(), imagen.getIdImagenes());
-                especie.setImagen(imagen);
-            }
-            Genetica idSecuencia = especie.getIdSecuencia();
-            if (idSecuencia != null) {
-                idSecuencia = em.getReference(idSecuencia.getClass(), idSecuencia.getIdSecuencia());
-                especie.setIdSecuencia(idSecuencia);
+                dominio.setImagen(imagen);
             }
             Collection<Nomenclatura> attachedNomenclaturaCollection = new ArrayList<Nomenclatura>();
-            for (Nomenclatura nomenclaturaCollectionNomenclaturaToAttach : especie.getNomenclaturaCollection()) {
+            for (Nomenclatura nomenclaturaCollectionNomenclaturaToAttach : dominio.getNomenclaturaCollection()) {
                 nomenclaturaCollectionNomenclaturaToAttach = em.getReference(nomenclaturaCollectionNomenclaturaToAttach.getClass(), nomenclaturaCollectionNomenclaturaToAttach.getNomenclaturaPK());
                 attachedNomenclaturaCollection.add(nomenclaturaCollectionNomenclaturaToAttach);
             }
-            especie.setNomenclaturaCollection(attachedNomenclaturaCollection);
-            em.persist(especie);
+            dominio.setNomenclaturaCollection(attachedNomenclaturaCollection);
+            em.persist(dominio);
             if (imagen != null) {
-                imagen.getEspecieCollection().add(especie);
+                imagen.getDominioCollection().add(dominio);
                 imagen = em.merge(imagen);
             }
-            if (idSecuencia != null) {
-                idSecuencia.getEspecieCollection().add(especie);
-                idSecuencia = em.merge(idSecuencia);
-            }
-            for (Nomenclatura nomenclaturaCollectionNomenclatura : especie.getNomenclaturaCollection()) {
-                Especie oldEspecieOfNomenclaturaCollectionNomenclatura = nomenclaturaCollectionNomenclatura.getEspecie();
-                nomenclaturaCollectionNomenclatura.setEspecie(especie);
+            for (Nomenclatura nomenclaturaCollectionNomenclatura : dominio.getNomenclaturaCollection()) {
+                Dominio oldDominioOfNomenclaturaCollectionNomenclatura = nomenclaturaCollectionNomenclatura.getDominio();
+                nomenclaturaCollectionNomenclatura.setDominio(dominio);
                 nomenclaturaCollectionNomenclatura = em.merge(nomenclaturaCollectionNomenclatura);
-                if (oldEspecieOfNomenclaturaCollectionNomenclatura != null) {
-                    oldEspecieOfNomenclaturaCollectionNomenclatura.getNomenclaturaCollection().remove(nomenclaturaCollectionNomenclatura);
-                    oldEspecieOfNomenclaturaCollectionNomenclatura = em.merge(oldEspecieOfNomenclaturaCollectionNomenclatura);
+                if (oldDominioOfNomenclaturaCollectionNomenclatura != null) {
+                    oldDominioOfNomenclaturaCollectionNomenclatura.getNomenclaturaCollection().remove(nomenclaturaCollectionNomenclatura);
+                    oldDominioOfNomenclaturaCollectionNomenclatura = em.merge(oldDominioOfNomenclaturaCollectionNomenclatura);
                 }
             }
             utx.commit();
@@ -98,25 +92,23 @@ public class EspecieJpaController implements Serializable {
         }
     }
 
-    public void edit(Especie especie) throws IllegalOrphanException, NonexistentEntityException, RollbackFailureException, Exception {
+    public void edit(Dominio dominio) throws IllegalOrphanException, NonexistentEntityException, RollbackFailureException, Exception {
         EntityManager em = null;
         try {
             utx.begin();
             em = getEntityManager();
-            Especie persistentEspecie = em.find(Especie.class, especie.getIdEspecie());
-            Imagenes imagenOld = persistentEspecie.getImagen();
-            Imagenes imagenNew = especie.getImagen();
-            Genetica idSecuenciaOld = persistentEspecie.getIdSecuencia();
-            Genetica idSecuenciaNew = especie.getIdSecuencia();
-            Collection<Nomenclatura> nomenclaturaCollectionOld = persistentEspecie.getNomenclaturaCollection();
-            Collection<Nomenclatura> nomenclaturaCollectionNew = especie.getNomenclaturaCollection();
+            Dominio persistentDominio = em.find(Dominio.class, dominio.getIdDominio());
+            Imagenes imagenOld = persistentDominio.getImagen();
+            Imagenes imagenNew = dominio.getImagen();
+            Collection<Nomenclatura> nomenclaturaCollectionOld = persistentDominio.getNomenclaturaCollection();
+            Collection<Nomenclatura> nomenclaturaCollectionNew = dominio.getNomenclaturaCollection();
             List<String> illegalOrphanMessages = null;
             for (Nomenclatura nomenclaturaCollectionOldNomenclatura : nomenclaturaCollectionOld) {
                 if (!nomenclaturaCollectionNew.contains(nomenclaturaCollectionOldNomenclatura)) {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain Nomenclatura " + nomenclaturaCollectionOldNomenclatura + " since its especie field is not nullable.");
+                    illegalOrphanMessages.add("You must retain Nomenclatura " + nomenclaturaCollectionOldNomenclatura + " since its dominio field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
@@ -124,11 +116,7 @@ public class EspecieJpaController implements Serializable {
             }
             if (imagenNew != null) {
                 imagenNew = em.getReference(imagenNew.getClass(), imagenNew.getIdImagenes());
-                especie.setImagen(imagenNew);
-            }
-            if (idSecuenciaNew != null) {
-                idSecuenciaNew = em.getReference(idSecuenciaNew.getClass(), idSecuenciaNew.getIdSecuencia());
-                especie.setIdSecuencia(idSecuenciaNew);
+                dominio.setImagen(imagenNew);
             }
             Collection<Nomenclatura> attachedNomenclaturaCollectionNew = new ArrayList<Nomenclatura>();
             for (Nomenclatura nomenclaturaCollectionNewNomenclaturaToAttach : nomenclaturaCollectionNew) {
@@ -136,32 +124,24 @@ public class EspecieJpaController implements Serializable {
                 attachedNomenclaturaCollectionNew.add(nomenclaturaCollectionNewNomenclaturaToAttach);
             }
             nomenclaturaCollectionNew = attachedNomenclaturaCollectionNew;
-            especie.setNomenclaturaCollection(nomenclaturaCollectionNew);
-            especie = em.merge(especie);
+            dominio.setNomenclaturaCollection(nomenclaturaCollectionNew);
+            dominio = em.merge(dominio);
             if (imagenOld != null && !imagenOld.equals(imagenNew)) {
-                imagenOld.getEspecieCollection().remove(especie);
+                imagenOld.getDominioCollection().remove(dominio);
                 imagenOld = em.merge(imagenOld);
             }
             if (imagenNew != null && !imagenNew.equals(imagenOld)) {
-                imagenNew.getEspecieCollection().add(especie);
+                imagenNew.getDominioCollection().add(dominio);
                 imagenNew = em.merge(imagenNew);
-            }
-            if (idSecuenciaOld != null && !idSecuenciaOld.equals(idSecuenciaNew)) {
-                idSecuenciaOld.getEspecieCollection().remove(especie);
-                idSecuenciaOld = em.merge(idSecuenciaOld);
-            }
-            if (idSecuenciaNew != null && !idSecuenciaNew.equals(idSecuenciaOld)) {
-                idSecuenciaNew.getEspecieCollection().add(especie);
-                idSecuenciaNew = em.merge(idSecuenciaNew);
             }
             for (Nomenclatura nomenclaturaCollectionNewNomenclatura : nomenclaturaCollectionNew) {
                 if (!nomenclaturaCollectionOld.contains(nomenclaturaCollectionNewNomenclatura)) {
-                    Especie oldEspecieOfNomenclaturaCollectionNewNomenclatura = nomenclaturaCollectionNewNomenclatura.getEspecie();
-                    nomenclaturaCollectionNewNomenclatura.setEspecie(especie);
+                    Dominio oldDominioOfNomenclaturaCollectionNewNomenclatura = nomenclaturaCollectionNewNomenclatura.getDominio();
+                    nomenclaturaCollectionNewNomenclatura.setDominio(dominio);
                     nomenclaturaCollectionNewNomenclatura = em.merge(nomenclaturaCollectionNewNomenclatura);
-                    if (oldEspecieOfNomenclaturaCollectionNewNomenclatura != null && !oldEspecieOfNomenclaturaCollectionNewNomenclatura.equals(especie)) {
-                        oldEspecieOfNomenclaturaCollectionNewNomenclatura.getNomenclaturaCollection().remove(nomenclaturaCollectionNewNomenclatura);
-                        oldEspecieOfNomenclaturaCollectionNewNomenclatura = em.merge(oldEspecieOfNomenclaturaCollectionNewNomenclatura);
+                    if (oldDominioOfNomenclaturaCollectionNewNomenclatura != null && !oldDominioOfNomenclaturaCollectionNewNomenclatura.equals(dominio)) {
+                        oldDominioOfNomenclaturaCollectionNewNomenclatura.getNomenclaturaCollection().remove(nomenclaturaCollectionNewNomenclatura);
+                        oldDominioOfNomenclaturaCollectionNewNomenclatura = em.merge(oldDominioOfNomenclaturaCollectionNewNomenclatura);
                     }
                 }
             }
@@ -174,9 +154,9 @@ public class EspecieJpaController implements Serializable {
             }
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Integer id = especie.getIdEspecie();
-                if (findEspecie(id) == null) {
-                    throw new NonexistentEntityException("The especie with id " + id + " no longer exists.");
+                Integer id = dominio.getIdDominio();
+                if (findDominio(id) == null) {
+                    throw new NonexistentEntityException("The dominio with id " + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -192,35 +172,30 @@ public class EspecieJpaController implements Serializable {
         try {
             utx.begin();
             em = getEntityManager();
-            Especie especie;
+            Dominio dominio;
             try {
-                especie = em.getReference(Especie.class, id);
-                especie.getIdEspecie();
+                dominio = em.getReference(Dominio.class, id);
+                dominio.getIdDominio();
             } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The especie with id " + id + " no longer exists.", enfe);
+                throw new NonexistentEntityException("The dominio with id " + id + " no longer exists.", enfe);
             }
             List<String> illegalOrphanMessages = null;
-            Collection<Nomenclatura> nomenclaturaCollectionOrphanCheck = especie.getNomenclaturaCollection();
+            Collection<Nomenclatura> nomenclaturaCollectionOrphanCheck = dominio.getNomenclaturaCollection();
             for (Nomenclatura nomenclaturaCollectionOrphanCheckNomenclatura : nomenclaturaCollectionOrphanCheck) {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This Especie (" + especie + ") cannot be destroyed since the Nomenclatura " + nomenclaturaCollectionOrphanCheckNomenclatura + " in its nomenclaturaCollection field has a non-nullable especie field.");
+                illegalOrphanMessages.add("This Dominio (" + dominio + ") cannot be destroyed since the Nomenclatura " + nomenclaturaCollectionOrphanCheckNomenclatura + " in its nomenclaturaCollection field has a non-nullable dominio field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
             }
-            Imagenes imagen = especie.getImagen();
+            Imagenes imagen = dominio.getImagen();
             if (imagen != null) {
-                imagen.getEspecieCollection().remove(especie);
+                imagen.getDominioCollection().remove(dominio);
                 imagen = em.merge(imagen);
             }
-            Genetica idSecuencia = especie.getIdSecuencia();
-            if (idSecuencia != null) {
-                idSecuencia.getEspecieCollection().remove(especie);
-                idSecuencia = em.merge(idSecuencia);
-            }
-            em.remove(especie);
+            em.remove(dominio);
             utx.commit();
         } catch (Exception ex) {
             try {
@@ -236,19 +211,19 @@ public class EspecieJpaController implements Serializable {
         }
     }
 
-    public List<Especie> findEspecieEntities() {
-        return findEspecieEntities(true, -1, -1);
+    public List<Dominio> findDominioEntities() {
+        return findDominioEntities(true, -1, -1);
     }
 
-    public List<Especie> findEspecieEntities(int maxResults, int firstResult) {
-        return findEspecieEntities(false, maxResults, firstResult);
+    public List<Dominio> findDominioEntities(int maxResults, int firstResult) {
+        return findDominioEntities(false, maxResults, firstResult);
     }
 
-    private List<Especie> findEspecieEntities(boolean all, int maxResults, int firstResult) {
+    private List<Dominio> findDominioEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Especie.class));
+            cq.select(cq.from(Dominio.class));
             Query q = em.createQuery(cq);
             if (!all) {
                 q.setMaxResults(maxResults);
@@ -260,20 +235,20 @@ public class EspecieJpaController implements Serializable {
         }
     }
 
-    public Especie findEspecie(Integer id) {
+    public Dominio findDominio(Integer id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Especie.class, id);
+            return em.find(Dominio.class, id);
         } finally {
             em.close();
         }
     }
 
-    public int getEspecieCount() {
+    public int getDominioCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Especie> rt = cq.from(Especie.class);
+            Root<Dominio> rt = cq.from(Dominio.class);
             cq.select(em.getCriteriaBuilder().count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();
